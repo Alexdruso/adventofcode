@@ -15,15 +15,15 @@ points = {
 }
 
 actions = {
-    'A X': 'Z',
-    'A Y': 'X',
-    'A Z': 'Y',
-    'B X': 'X',
-    'B Y': 'Y',
-    'B Z': 'Z',
-    'C X': 'Y',
-    'C Y': 'Z',
-    'C Z': 'X',
+    'A X': 'A Z',
+    'A Y': 'A X',
+    'A Z': 'A Y',
+    'B X': 'B X',
+    'B Y': 'B Y',
+    'B Z': 'B Z',
+    'C X': 'C Y',
+    'C Y': 'C Z',
+    'C Z': 'C X',
 }
 
 
@@ -45,7 +45,7 @@ def part_two(input_data: list[str]):
         map(
             points.get,
             map(
-                lambda line: line[0] + ' ' + actions[line],
+                actions.get,
                 input_data
             )
         )
