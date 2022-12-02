@@ -1,5 +1,5 @@
 # Advent of Code ⭐️
-[![Stars collected](https://shields.io/static/v1?label=stars%20collected&message=2&color=yellow)]()
+[![Stars collected](https://shields.io/static/v1?label=stars%20collected&message=4&color=yellow)]()
 [![codecov](https://codecov.io/gh/marcelblijleven/adventofcode/branch/master/graph/badge.svg?token=jZ2TgfyltM)](https://codecov.io/gh/marcelblijleven/adventofcode)
 [![tests](https://github.com/marcelblijleven/adventofcode/actions/workflows/tests.yaml/badge.svg)](https://github.com/marcelblijleven/adventofcode)
 [![version](https://img.shields.io/github/v/release/marcelblijleven/adventofcode.svg)](https://github.com/marcelblijleven/adventofcode/releases)
@@ -36,6 +36,7 @@ Collection of my Advent of Code solutions in an overkill project setup 👻🎄.
 | day   | part one | part two |
 | :---: | :------: | :------: |
 | 01 | ⭐️ | ⭐️ |
+| 02 | ⭐️ | ⭐️ |
 
 </p>
 </details>
@@ -52,7 +53,9 @@ Collection of my Advent of Code solutions in an overkill project setup 👻🎄.
 |  day  | part  | duration |
 | :---: | :---: | -------: |
 | 01 | part one | 0.47 ms |
-| 01 | part two | 0.50 ms |
+| 01 | part two | 0.46 ms |
+| 02 | part one | 0.12 ms |
+| 02 | part two | 0.53 ms |
 
 </p>
 </details>
