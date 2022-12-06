@@ -41,7 +41,7 @@ def part_two(input_data: list[str]):
     solution = map(set, input_data)
     solution = list(solution)
     solution = [solution[index:index+3] for index in range(0, len(solution) - 2, 3)]
-    solution = map(lambda team: reduce(lambda member_1, member_2: member_1&member_2, team), solution)
+    solution = map(lambda team: reduce(lambda member_1, member_2: member_1 & member_2, team), solution)
     solution = map(lambda common_item: common_item.pop(), solution)
     solution = map(priority.get, solution)
     answer = sum(solution)
