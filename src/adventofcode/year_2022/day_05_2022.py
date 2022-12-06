@@ -1,5 +1,3 @@
-from typing import Tuple
-
 from adventofcode.util.exceptions import SolutionNotFoundException
 from adventofcode.registry.decorators import register_solution
 from adventofcode.util.input_helpers import get_input_for_day
@@ -17,9 +15,11 @@ def prepare_crates(crates: list[str]) -> list[Deque[str]]:
 
     for line in crates[:-1]:
         for index in range(num_towers):
-            if index * 4 + 1 >= len(line): break
+            if index * 4 + 1 >= len(line):
+                break
             crate = line[index * 4 + 1]
-            if crate != ' ': output[index].append(crate)
+            if crate != ' ':
+                output[index].append(crate)
 
     return output
 
