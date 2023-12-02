@@ -1,5 +1,5 @@
 # Advent of Code ⭐️
-[![Stars collected](https://shields.io/static/v1?label=stars%20collected&message=18&color=yellow)]()
+[![Stars collected](https://shields.io/static/v1?label=stars%20collected&message=20&color=yellow)]()
 [![codecov](https://codecov.io/gh/marcelblijleven/adventofcode/branch/master/graph/badge.svg?token=jZ2TgfyltM)](https://codecov.io/gh/marcelblijleven/adventofcode)
 [![tests](https://github.com/marcelblijleven/adventofcode/actions/workflows/tests.yaml/badge.svg)](https://github.com/marcelblijleven/adventofcode)
 [![version](https://img.shields.io/github/v/release/marcelblijleven/adventofcode.svg)](https://github.com/marcelblijleven/adventofcode/releases)
@@ -48,6 +48,17 @@ Collection of my Advent of Code solutions in an overkill project setup 👻🎄.
 </p>
 </details>
 
+### 2023
+<details><summary>Solutions for 2023</summary>
+<p>
+
+| day   | part one | part two |
+| :---: | :------: | :------: |
+| 01 | ⭐️ | ⭐️ |
+
+</p>
+</details>
+
 
 <!-- end completed section -->
 
@@ -59,24 +70,36 @@ Collection of my Advent of Code solutions in an overkill project setup 👻🎄.
 
 |  day  | part  | duration |
 | :---: | :---: | -------: |
-| 01 | part one | 0.85 ms |
-| 01 | part two | 0.46 ms |
-| 02 | part one | 0.11 ms |
-| 02 | part two | 0.16 ms |
-| 03 | part one | 0.56 ms |
-| 03 | part two | 0.56 ms |
-| 04 | part one | 2.62 ms |
-| 04 | part two | 2.50 ms |
-| 05 | part one | 0.98 ms |
-| 05 | part two | 0.73 ms |
-| 06 | part one | 1.12 ms |
-| 06 | part two | 2.72 ms |
-| 07 | part one | 1.53 ms |
-| 07 | part two | 1.71 ms |
-| 08 | part one | 65.03 ms |
-| 08 | part two | 512.69 ms |
-| 09 | part one | 7.92 ms |
-| 09 | part two | 92.23 ms |
+| 01 | part one | 1.99 ms |
+| 01 | part two | 1.58 ms |
+| 02 | part one | 0.40 ms |
+| 02 | part two | 0.49 ms |
+| 03 | part one | 1.86 ms |
+| 03 | part two | 1.91 ms |
+| 04 | part one | 9.72 ms |
+| 04 | part two | 7.99 ms |
+| 05 | part one | 1.86 ms |
+| 05 | part two | 2.22 ms |
+| 06 | part one | 1.73 ms |
+| 06 | part two | 8.28 ms |
+| 07 | part one | 3.12 ms |
+| 07 | part two | 3.13 ms |
+| 08 | part one | 78.10 ms |
+| 08 | part two | 435.82 ms |
+| 09 | part one | 9.79 ms |
+| 09 | part two | 74.42 ms |
+
+</p>
+</details>
+
+### 2023
+<details><summary>Benchmarks for 2023</summary>
+<p>
+
+|  day  | part  | duration |
+| :---: | :---: | -------: |
+| 01 | part one | 6.06 ms |
+| 01 | part two | 7.49 ms |
 
 </p>
 </details>
