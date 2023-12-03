@@ -2,6 +2,7 @@ from adventofcode.util.exceptions import SolutionNotFoundException
 from adventofcode.registry.decorators import register_solution
 from adventofcode.util.input_helpers import get_input_for_day
 from collections.abc import Iterator
+from collections import defaultdict
 from functools import reduce
 
 directions = [(1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)]
@@ -35,6 +36,28 @@ def _valid_numbers(row_idx: int, row: str, symbols: set[tuple[int, int]]) -> Ite
         yield int(temp)
 
 
+def _numbers_to_operators(row_idx: int, row: str, symbols: set[tuple[int, int]]) -> Iterator[
+    tuple[int, set[tuple[int, int]]]]:
+    linked_symbols: set[tuple[int, int]] = set()
+    temp = ''
+    for index in range(len(row)):
+        symbol = row[index]
+        if ord(symbol) in range(ord('0'), ord('9') + 1):
+            temp += symbol
+            linked_symbols |= {
+                x
+                for x in _adjacent_coordinates(row_idx, index)
+                if x in symbols
+            }
+        else:
+            if len(linked_symbols) > 0:
+                yield int(temp), linked_symbols
+            linked_symbols = set()
+            temp = ''
+    if len(linked_symbols) > 0:
+        yield int(temp), linked_symbols
+
+
 @register_solution(2023, 3, 1)
 def part_one(input_data: list[str]):
     symbols = {
@@ -49,7 +72,7 @@ def part_one(input_data: list[str]):
         number
         for row_idx, row in enumerate(input_data)
         for number in _valid_numbers(row_idx, row, symbols)
-)
+    )
 
     if not answer:
         raise SolutionNotFoundException(2023, 3, 1)
@@ -59,7 +82,24 @@ def part_one(input_data: list[str]):
 
 @register_solution(2023, 3, 2)
 def part_two(input_data: list[str]):
-    answer = ...
+    potential_gears = {
+        (x, y)
+        for x, row in enumerate(input_data)
+        for y, symbol in enumerate(row)
+        if symbol == '*'
+    }
+
+    operators_to_numbers = defaultdict(list)
+    for row_idx, row in enumerate(input_data):
+        for number, operators in _numbers_to_operators(row_idx, row, potential_gears):
+            for operator in operators:
+                operators_to_numbers[operator].append(number)
+
+    answer = sum(
+        reduce(lambda x, y: x * y, operators_to_numbers[operator], 1)
+        for operator in potential_gears
+        if len(operators_to_numbers[operator]) == 2
+    )
 
     if not answer:
         raise SolutionNotFoundException(2023, 3, 2)
