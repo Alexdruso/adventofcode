@@ -1,5 +1,5 @@
 # Advent of Code ⭐️
-[![Stars collected](https://shields.io/static/v1?label=stars%20collected&message=26&color=yellow)]()
+[![Stars collected](https://shields.io/static/v1?label=stars%20collected&message=34&color=yellow)]()
 [![codecov](https://codecov.io/gh/marcelblijleven/adventofcode/branch/master/graph/badge.svg?token=jZ2TgfyltM)](https://codecov.io/gh/marcelblijleven/adventofcode)
 [![tests](https://github.com/marcelblijleven/adventofcode/actions/workflows/tests.yaml/badge.svg)](https://github.com/marcelblijleven/adventofcode)
 [![version](https://img.shields.io/github/v/release/marcelblijleven/adventofcode.svg)](https://github.com/marcelblijleven/adventofcode/releases)
@@ -58,6 +58,10 @@ Collection of my Advent of Code solutions in an overkill project setup 👻🎄.
 | 02 | ⭐️ | ⭐️ |
 | 03 | ⭐️ | ⭐️ |
 | 04 | ⭐️ | ⭐️ |
+| 05 | ⭐️ | ⭐️ |
+| 06 | ⭐️ | ⭐️ |
+| 07 | ⭐️ | ⭐️ |
+| 08 | ⭐️ | ⭐️ |
 
 </p>
 </details>
@@ -73,24 +77,24 @@ Collection of my Advent of Code solutions in an overkill project setup 👻🎄.
 
 |  day  | part  | duration |
 | :---: | :---: | -------: |
-| 01 | part one | 0.93 ms |
-| 01 | part two | 0.91 ms |
-| 02 | part one | 0.23 ms |
-| 02 | part two | 0.30 ms |
-| 03 | part one | 1.03 ms |
-| 03 | part two | 1.17 ms |
-| 04 | part one | 4.36 ms |
-| 04 | part two | 4.65 ms |
-| 05 | part one | 1.03 ms |
-| 05 | part two | 1.20 ms |
-| 06 | part one | 0.93 ms |
-| 06 | part two | 5.60 ms |
-| 07 | part one | 1.68 ms |
-| 07 | part two | 1.81 ms |
-| 08 | part one | 192.95 ms |
-| 08 | part two | 475.25 ms |
-| 09 | part one | 7.81 ms |
-| 09 | part two | 60.04 ms |
+| 01 | part one | 1.52 ms |
+| 01 | part two | 1.44 ms |
+| 02 | part one | 0.40 ms |
+| 02 | part two | 0.49 ms |
+| 03 | part one | 1.65 ms |
+| 03 | part two | 1.70 ms |
+| 04 | part one | 7.16 ms |
+| 04 | part two | 7.02 ms |
+| 05 | part one | 1.62 ms |
+| 05 | part two | 1.97 ms |
+| 06 | part one | 1.57 ms |
+| 06 | part two | 7.23 ms |
+| 07 | part one | 2.71 ms |
+| 07 | part two | 3.08 ms |
+| 08 | part one | 129.77 ms |
+| 08 | part two | 462.96 ms |
+| 09 | part one | 11.97 ms |
+| 09 | part two | 115.60 ms |
 
 </p>
 </details>
@@ -101,14 +105,22 @@ Collection of my Advent of Code solutions in an overkill project setup 👻🎄.
 
 |  day  | part  | duration |
 | :---: | :---: | -------: |
-| 01 | part one | 4.73 ms |
-| 01 | part two | 6.00 ms |
-| 02 | part one | 0.90 ms |
-| 02 | part two | 1.02 ms |
-| 03 | part one | 10.62 ms |
-| 03 | part two | 11.95 ms |
-| 04 | part one | 0.91 ms |
-| 04 | part two | 0.92 ms |
+| 01 | part one | 9.25 ms |
+| 01 | part two | 11.64 ms |
+| 02 | part one | 1.75 ms |
+| 02 | part two | 1.90 ms |
+| 03 | part one | 20.44 ms |
+| 03 | part two | 22.89 ms |
+| 04 | part one | 1.70 ms |
+| 04 | part two | 1.81 ms |
+| 05 | part one | 3.09 ms |
+| 05 | part two | 0.00 ms |
+| 06 | part one | 0.03 ms |
+| 06 | part two | 0.02 ms |
+| 07 | part one | 0.24 ms |
+| 07 | part two | 0.00 ms |
+| 08 | part one | 7.21 ms |
+| 08 | part two | 34.79 ms |
 
 </p>
 </details>
