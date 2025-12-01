@@ -19,20 +19,17 @@ generate-readme = "adventofcode.scripts.generate_readme:generate_readme"
 run-all = "adventofcode.scripts.runner:run_all"
 
 [tool.poetry.group.dev.dependencies]
-httpx = "^0.28.0"
-coverage = { extras = ["toml"], version = "^7.6.8" }
-pytest = "^8.3.4"
-pytest-cov = "^6.0.0"
+httpx = "^0.28.1"
+coverage = { extras = ["toml"], version = "^7.6.9" }
+pytest = "^8.4.2"
+pytest-cov = "^6.1.0"
 pytest-mock = "^3.14.0"
-ruff = "^0.8.1"
-mypy = "^1.13.0"
-commitizen = "^4.0.0"
+ruff = "^0.8.3"
+mypy = "^1.14.1"
+commitizen = "^4.1.1"
+pre-commit = "^3.8.1"
 
-[tool.ruff.lint.isort]
-known-first-party = ["adventofcode"]
-
-[tool.ruff.lint.flake8-tidy-imports]
-ban-relative-imports = "all"
+[tool.ruff]
 
 [tool.coverage.run]
 source_pkgs = ["adventofcode", "tests"]

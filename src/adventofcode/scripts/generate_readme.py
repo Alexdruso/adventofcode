@@ -103,7 +103,7 @@ def _update_year_readme(year: int) -> None:
     days = found.keys()
     completed_parts = sum([len(parts.keys()) for parts in found.values()])
     body: list[str] = [
-        f'Solutions for {len(days)} {"day" if len(days) == 0 else "days"} in {year} '
+        f"Solutions for {len(days)} {'day' if len(days) == 0 else 'days'} in {year} "
         f"with a total of {completed_parts} stars collected",
         "",
     ]

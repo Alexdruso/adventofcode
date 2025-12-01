@@ -35,7 +35,7 @@ def apply_explode_update_left(number: int, sub_string: str) -> str:
     last_match = matches[-1]
     value = last_match.group()
     span = last_match.span()
-    return f"{sub_string[:span[0]]}{int(value) + number}{sub_string[span[1]:]}"
+    return f"{sub_string[: span[0]]}{int(value) + number}{sub_string[span[1] :]}"
 
 
 def apply_explode_update_right(number: int, sub_string: str) -> str:
@@ -47,7 +47,7 @@ def apply_explode_update_right(number: int, sub_string: str) -> str:
     first_match = matches[0]
     value = first_match.group()
     span = first_match.span()
-    return f"{sub_string[:span[0]]}{int(value) + number}{sub_string[span[1]:]}"
+    return f"{sub_string[: span[0]]}{int(value) + number}{sub_string[span[1] :]}"
 
 
 def explode(snailfish_number: str) -> tuple[str, bool]:
@@ -124,7 +124,7 @@ def calculate_magnitude(snailfish_number: str) -> int:
         pair_value = left * 3 + right * 2
         span = pair.span()
         snailfish_number = (
-            f"{snailfish_number[:span[0]]}{pair_value}{snailfish_number[span[1]:]}"
+            f"{snailfish_number[: span[0]]}{pair_value}{snailfish_number[span[1] :]}"
         )
         return calculate_magnitude(snailfish_number)
 
