@@ -1,53 +1,62 @@
-from adventofcode.util.exceptions import SolutionNotFoundException
+import re
+
 from adventofcode.registry.decorators import register_solution
+from adventofcode.util.exceptions import SolutionNotFoundError
 from adventofcode.util.input_helpers import get_input_for_day
-from collections import defaultdict
 
 
-def _won_scratchcards(scratchcard: str) -> int:
-    winning_numbers, card = scratchcard.split(':')[1].split('|')
-    winning_numbers = set(winning_numbers.split())
-    card = set(card.split())
+def parse_card(line: str) -> int:
+    pattern = re.compile("\\d{1,2}")
+    _, numbers = line.split(": ")
+    split_card = numbers.split(" | ")
+    winning_numbers = set(map(int, pattern.findall(split_card[0])))
+    my_numbers = set(map(int, pattern.findall(split_card[1])))
+    my_winning_numbers = winning_numbers & my_numbers
 
-    return len(winning_numbers & card)
+    if not my_winning_numbers:
+        return 0
+
+    return 2 ** (len(my_winning_numbers) - 1)
 
 
-def _points(scratchcard: str) -> int:
-    return int(2 ** (_won_scratchcards(scratchcard) - 1))
+def parse_cards_with_copy(lines: list[str]):
+    pattern = re.compile("\\d{1,2}")
+    card_registry = [1] * len(lines)
+
+    for game_number, line in enumerate(lines):
+        _, numbers = line.split(": ")
+        split_card = numbers.split(" | ")
+        winning_numbers = set(map(int, pattern.findall(split_card[0])))
+        my_numbers = set(map(int, pattern.findall(split_card[1])))
+        len_winning_numbers = len(winning_numbers & my_numbers)
+
+        for num in range(1, len_winning_numbers + 1):
+            card_registry[game_number + num] += card_registry[game_number]
+
+    return sum(card_registry)
 
 
 @register_solution(2023, 4, 1)
 def part_one(input_data: list[str]):
-    answer = sum(
-        _points(scratchcard)
-        for scratchcard
-        in input_data
-    )
+    answer = sum(map(parse_card, input_data))
 
     if not answer:
-        raise SolutionNotFoundException(2023, 4, 1)
+        raise SolutionNotFoundError(2023, 4, 1)
 
     return answer
 
 
 @register_solution(2023, 4, 2)
 def part_two(input_data: list[str]):
-    scratchcards_number = [1] * len(input_data)
-
-    for index, scratchcard in enumerate(input_data):
-        won_scratchcards = _won_scratchcards(scratchcard)
-        for won_scratchcard in range(index+1, index + won_scratchcards+1):
-            scratchcards_number[won_scratchcard] += scratchcards_number[index]
-
-    answer = sum(scratchcards_number)
+    answer = parse_cards_with_copy(input_data)
 
     if not answer:
-        raise SolutionNotFoundException(2023, 4, 2)
+        raise SolutionNotFoundError(2023, 4, 2)
 
     return answer
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     data = get_input_for_day(2023, 4)
     part_one(data)
     part_two(data)

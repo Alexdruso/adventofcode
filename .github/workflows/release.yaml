@@ -1,25 +1,33 @@
-name: Release
+name: Bump version
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - master
+
+permissions:
+  contents: write
 
 jobs:
-
-  build:
+  bump-version:
+    if: "!startsWith(github.event.head_commit.message, 'bump:')"
     runs-on: ubuntu-latest
+    name: "Bump version and create changelog with commitizen"
     steps:
-      - uses: actions/checkout@v3
-      - name: release
-        uses: actions/create-release@v1
-        id: create_release
+      - name: Check out
+        uses: actions/checkout@v4
         with:
-          draft: false
-          prerelease: false
-          release_name: Release ${{ github.ref }}
-          tag_name: ${{ github.ref }}
-          body : |
-            This is an automated release, see [the changelog](https://github.com/marcelblijleven/adventofcode/blob/master/CHANGELOG.md) for changes
+          fetch-depth: 0
+          token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Create bump and changelog
+        uses: commitizen-tools/commitizen-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          changelog_increment_filename: body.md
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: "body.md"
+          tag_name: ${{ env.REVISION }}
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

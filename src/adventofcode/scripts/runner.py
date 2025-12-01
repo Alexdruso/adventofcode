@@ -23,18 +23,18 @@ def run_all() -> None:
     config.RUNNING_ALL = False
 
 
-def _run_day(module: str, year: int, day: int):
+def _run_day(module, year: int, day: int):
     """
     Runs all solutions in the given day
     """
     data = get_input_for_day(year, day)
     try:
-        getattr(module, "part_one")(data)
+        module.part_one(data)
     except AttributeError:
         pass
 
     try:
-        getattr(module, "part_two")(data)
+        module.part_two(data)
     except AttributeError:
         pass
 

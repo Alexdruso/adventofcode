@@ -1,7 +1,6 @@
 import os
 import warnings
 
-
 from adventofcode.config import ROOT_DIR
 
 
@@ -37,7 +36,7 @@ def _get_input(file_name) -> list[str]:
     Strips new lines from input file and returns it as list of string
     """
     lines = _read_lines(file_name)
-    return [line.strip() for line in lines]
+    return [line.rstrip() for line in lines]
 
 
 def _read_file(file_name) -> str:

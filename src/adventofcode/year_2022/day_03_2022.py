@@ -1,58 +1,81 @@
-from adventofcode.util.exceptions import SolutionNotFoundException
-from adventofcode.registry.decorators import register_solution
-from adventofcode.util.input_helpers import get_input_for_day
-from functools import reduce
+import string
 
-priority = {
-    chr(index + ord('a') - 1): index for index in range(1, 27)
-} | {
-    chr(index + ord('A') - 27): index for index in range(27, 53)
-}
+from adventofcode.registry.decorators import register_solution
+from adventofcode.util.exceptions import SolutionNotFoundError
+from adventofcode.util.input_helpers import get_input_for_day
+
+
+def split_rucksack(rucksack: str) -> tuple[str, str]:
+    mid = int(len(rucksack) / 2)
+    return rucksack[:mid], rucksack[mid:]
+
+
+def compare_compartments(a: str, b: str) -> str | None:
+    if not (found := (set(a) & set(b))):
+        return None
+
+    return found.pop()
+
+
+def get_letter_value(letter: str) -> int:
+    return string.ascii_letters.index(letter) + 1
+
+
+def rucksacks_part_one(input_data: list[str]) -> int:
+    score: int = 0
+
+    for rucksack in input_data:
+        if (
+            matched_letter := compare_compartments(*split_rucksack(rucksack))
+        ) is not None:
+            score += get_letter_value(matched_letter)
+
+    return score
+
+
+def get_groups_of_three(input_data: list[str]):
+    for idx in range(0, len(input_data), 3):
+        yield input_data[idx : idx + 3]
+
+
+def compare_rucksacks(a: str, b: str, c: str) -> str | None:
+    if not (found := (set(a) & set(b) & set(c))):
+        return None
+
+    return found.pop()
+
+
+def rucksacks_part_two(input_data: list[str]) -> int:
+    score: int = 0
+
+    for group in get_groups_of_three(input_data):
+        if matched_letter := compare_rucksacks(*group):
+            score += get_letter_value(matched_letter)
+
+    return score
 
 
 @register_solution(2022, 3, 1)
 def part_one(input_data: list[str]):
-    solution = map(
-        lambda rucksack: (rucksack[:len(rucksack) // 2], rucksack[len(rucksack) // 2:]),
-        input_data
-    )
+    answer = rucksacks_part_one(input_data)
 
-    solution = map(
-        lambda rucksack: (set(rucksack[0]), set(rucksack[1])),
-        solution
-    )
-
-    solution = map(
-        lambda rucksack: rucksack[0] & rucksack[1],
-        solution
-    )
-
-    solution = map(lambda rucksack: rucksack.pop(), solution)
-    solution = map(priority.get, solution)
-    answer = sum(solution)
     if not answer:
-        raise SolutionNotFoundException(2022, 3, 1)
+        raise SolutionNotFoundError(2022, 3, 1)
 
     return answer
 
 
 @register_solution(2022, 3, 2)
 def part_two(input_data: list[str]):
-    solution = map(set, input_data)
-    solution = list(solution)
-    solution = [solution[index:index+3] for index in range(0, len(solution) - 2, 3)]
-    solution = map(lambda team: reduce(lambda member_1, member_2: member_1 & member_2, team), solution)
-    solution = map(lambda common_item: common_item.pop(), solution)
-    solution = map(priority.get, solution)
-    answer = sum(solution)
+    answer = rucksacks_part_two(input_data)
 
     if not answer:
-        raise SolutionNotFoundException(2022, 3, 2)
+        raise SolutionNotFoundError(2022, 3, 2)
 
     return answer
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     data = get_input_for_day(2022, 3)
     part_one(data)
     part_two(data)

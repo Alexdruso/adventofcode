@@ -1,74 +1,102 @@
-from adventofcode.util.exceptions import SolutionNotFoundException
-from adventofcode.registry.decorators import register_solution
-from adventofcode.util.input_helpers import get_input_for_day
+import math
 import re
-from functools import reduce
-from collections import defaultdict
+
+from adventofcode.registry.decorators import register_solution
+from adventofcode.util.exceptions import SolutionNotFoundError
+from adventofcode.util.input_helpers import get_input_for_day
+
+game_pattern = re.compile(r"(?:(?P<amount>\d+)\s|(?P<color>red|blue|green))")
 
 
-def _id(game: str) -> int:
-    return int(game.lstrip("Game ").split(':')[0])
+def parse_game(line) -> list[dict[str, int]]:
+    prefix, game = line.split(": ")
+    game_values = []
+    rounds = game.split("; ")
+
+    for _round in rounds:
+        pairs = _round.split(", ")
+
+        round_values = {}
+        for pair in pairs:
+            number, color = pair.split(" ")
+            round_values[color] = int(number)
+
+        game_values.append(round_values)
+
+    return game_values
 
 
-limits = {
-    "red": 12,
-    "blue": 14,
-    "green": 13
-}
+def check_game(constraints: dict[str, int], game_values: list[dict[str, int]]) -> bool:
+    for color, value in constraints.items():
+        for game_value in game_values:
+            if (check := game_value.get(color)) is not None and check > value:
+                return False
+
+    return True
 
 
-def _check_combo(combo: str) -> bool:
-    number, color = combo.split()
-    return int(number) <= limits[color]
+def check_minimum(game_values: list[dict[str, int]]) -> int:
+    minimums: dict[str, int] = {}
+
+    for game_value in game_values:
+        for color, value in game_value.items():
+            if color not in minimums:
+                minimums[color] = value
+            else:
+                minimums[color] = max(value, minimums[color])
+    return math.prod(minimums.values())
 
 
-def _is_possible(game: str) -> bool:
-    game = game.split(': ')[1]
-    game = re.split('; |, ', game)
-    game = map(_check_combo, game)
+def find_possibilities(lines: list[str]) -> int:
+    # only 12 red cubes, 13 green cubes, and 14 blue cubes
+    constraints = {
+        "red": 12,
+        "green": 13,
+        "blue": 14,
+    }
 
-    return reduce(lambda x, y: x and y, game, True)
+    sum_of_ids: int = 0
+
+    for game_number, line in enumerate(lines, start=1):
+        game_values = parse_game(line)
+
+        if check_game(constraints, game_values):
+            sum_of_ids += game_number
+
+    return sum_of_ids
+
+
+def find_minimum_possible(lines: list[str]) -> int:
+    total: int = 0
+    for line in lines:
+        game_values = parse_game(line)
+
+        total += check_minimum(game_values)
+
+    return total
 
 
 @register_solution(2023, 2, 1)
 def part_one(input_data: list[str]):
-    answer = sum(_id(game) for game in input_data if _is_possible(game))
+    answer = find_possibilities(input_data)
 
     if not answer:
-        raise SolutionNotFoundException(2023, 2, 1)
+        raise SolutionNotFoundError(2023, 2, 1)
 
     return answer
-
-
-def _min_set(game: str) -> tuple[int, int, int]:
-    game = game.split(': ')[1]
-    game = re.split('; |, ', game)
-
-    minimum_set = defaultdict(int)
-
-    for number, color in map(lambda combo: combo.split(), game):
-        minimum_set[color] = max(minimum_set[color], int(number))
-
-    return minimum_set["red"], minimum_set["blue"], minimum_set["green"]
 
 
 @register_solution(2023, 2, 2)
 def part_two(input_data: list[str]):
-    answer = sum(
-        reduce(
-            lambda x, y: x * y,
-            _min_set(game),
-            1)
-        for game in input_data
-    )
+    answer = find_minimum_possible(input_data)
 
     if not answer:
-        raise SolutionNotFoundException(2023, 2, 2)
+        raise SolutionNotFoundError(2023, 2, 2)
 
     return answer
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     data = get_input_for_day(2023, 2)
     part_one(data)
     part_two(data)

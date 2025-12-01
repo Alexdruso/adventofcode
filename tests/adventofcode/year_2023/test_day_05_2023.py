@@ -1,4 +1,4 @@
-from adventofcode.year_2023.day_05_2023 import part_two, part_one
+from adventofcode.year_2023.day_05_2023 import part_one, part_two
 
 test_input = [
     "seeds: 79 14 55 13",
@@ -42,4 +42,4 @@ def test_part_one():
 
 
 def test_part_two():
-    assert part_two(test_input) == 'x'
+    assert part_two(test_input) == 46

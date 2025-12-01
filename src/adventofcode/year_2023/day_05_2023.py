@@ -1,57 +1,88 @@
-from adventofcode.util.exceptions import SolutionNotFoundException
+import re
+
 from adventofcode.registry.decorators import register_solution
+from adventofcode.util.exceptions import SolutionNotFoundError
 from adventofcode.util.input_helpers import get_input_for_day
-from collections.abc import Iterator
+
+pattern = re.compile("\\d+")
 
 
-def _seeds(seeds: str) -> Iterator[int]:
-    return (int(seed) for seed in seeds.lstrip('seeds:').split())
+def parse_inputs(data: list[str]) -> list[list[str]]:
+    as_text = "\n".join(data)
+    return [line.split("\n") for line in as_text.split("\n\n")]
 
 
-def _apply_map(seed: int, transformation_map: list[tuple[int, int, int]]):
-    for destination_start, source_start, range_len in transformation_map:
-        source_range = range(source_start, source_start + range_len)
-        if seed in source_range:
-            return destination_start + (seed - source_start)
-    return seed
+def find_locations(data: list[str]) -> int:
+    """
+    Parse input back to str, and split by \n\n to get the
+    mappings easier
+    """
+    sections = parse_inputs(data)
+    seeds = {x: x for x in map(int, pattern.findall(sections[0][0]))}
+
+    for mapping in sections[1:]:
+        for seed, value in seeds.items():
+            for _range in mapping[1:]:
+                dest, src, length = list(map(int, pattern.findall(_range)))
+                if src <= value < (src + length):
+                    seeds[seed] = dest + (value - src)
+
+    return min(seeds.values())
+
+
+def find_locations_part_two(data: list[str]) -> int:
+    sections = parse_inputs(data)
+    seeds = list(map(int, pattern.findall(sections[0][0])))
+    seed_pairs: list[list[int]] = []
+
+    for idx in range(0, len(seeds), 2):
+        seed_pairs.append([seeds[idx], seeds[idx] + seeds[idx + 1] - 1])
+
+    for mapping in sections[1:]:
+        for idx, pair in enumerate(seed_pairs):
+            start, end = pair
+            for _range in mapping[1:]:
+                dest, src, length = list(map(int, pattern.findall(_range)))
+
+                if src <= start < (src + length):
+                    seed_pairs[idx][0] = dest + (start - src)
+                    if end < src + length:
+                        seed_pairs[idx][1] = dest + (end - src)
+                    else:
+                        seed_pairs[idx][1] = dest + length - 1
+                        seed_pairs.append([src + length, end])
+                elif src <= end < (src + length):
+                    seed_pairs[idx][1] = dest + (end - src)
+                    if start > src:
+                        seed_pairs[idx][0] = dest + (start - src)
+                    else:
+                        seed_pairs[idx][0] = dest
+                        seed_pairs.append([start, src - 1])
+
+    return min(min(seed_pairs))
 
 
 @register_solution(2023, 5, 1)
 def part_one(input_data: list[str]):
-    print(input_data)
-    seeds = _seeds(input_data.pop(0))
-    transformation_maps = []
-    transformation_map = []
-    for line in input_data:
-        if line == "" or line.endswith("map:"):
-            transformation_maps.append(transformation_map)
-            transformation_map = []
-        else:
-            transformation_map.append(tuple(int(number) for number in line.split()))
-
-    for transformation_map in transformation_maps:
-        seeds = [_apply_map(seed, transformation_map) for seed in seeds]
-        print(seeds)
-
-    answer = min(seeds)
+    answer = find_locations(input_data)
 
     if not answer:
-        raise SolutionNotFoundException(2023, 5, 1)
+        raise SolutionNotFoundError(2023, 5, 1)
 
     return answer
 
 
 @register_solution(2023, 5, 2)
 def part_two(input_data: list[str]):
-    answer = ...
+    answer = find_locations_part_two(input_data)
 
     if not answer:
-        raise SolutionNotFoundException(2023, 5, 2)
+        raise SolutionNotFoundError(2023, 5, 2)
 
     return answer
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     data = get_input_for_day(2023, 5)
     part_one(data)
     part_two(data)
