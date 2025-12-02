@@ -5,7 +5,22 @@ from adventofcode.util.input_helpers import get_input_for_day
 
 @register_solution(2025, 2, 1)
 def part_one(input_data: list[str]):
-    answer = ...
+    input_data = input_data[0].split(",")
+
+    input_data = (line.split("-") for line in input_data)
+
+    input_data = ((int(start), int(end)) for (start, end) in input_data)
+
+    answer = 0
+
+    for start, end in input_data:
+        # NOTE: this is dumb, there must be a better way
+        for element in range(start, end + 1):
+            element = str(element)
+
+            if len(element) % 2 == 0:
+                if element[: len(element) // 2] == element[len(element) // 2 :]:
+                    answer += int(element)
 
     if not answer:
         raise SolutionNotFoundError(2025, 2, 1)
