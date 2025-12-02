@@ -30,11 +30,28 @@ def part_one(input_data: list[str]):
 
 @register_solution(2025, 2, 2)
 def part_two(input_data: list[str]):
-    answer = ...
+    input_data = input_data[0].split(",")
+
+    input_data = (line.split("-") for line in input_data)
+
+    input_data = ((int(start), int(end)) for (start, end) in input_data)
+
+    answer = 0
+
+    for start, end in input_data:
+        # NOTE: this is dumb, there must be a better way
+        for element in range(start, end + 1):
+            element = str(element)
+
+            for i in range(1, len(element)):
+                if element[:i] * (len(element) // i) == element:
+                    answer += int(element)
+                    break
 
     if not answer:
-        raise SolutionNotFoundError(2025, 2, 2)
+        raise SolutionNotFoundError(2025, 2, 1)
 
+    return answer
     return answer
 
 
