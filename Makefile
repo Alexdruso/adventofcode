@@ -1,10 +1,22 @@
-.PHONY: clean_project dev py-fmt
+.PHONY: clean_project dev dev-recreate py-fmt
 
 dev:
-	uv pip install -e .
+	# create a virtualenv in .venv if it does not exist
+	test -d .venv || python3 -m venv .venv
+	.venv/bin/python -m pip install --upgrade pip
+	.venv/bin/pip install -e .
 	# ensure pre-commit is installed in the venv
-	uv pip install --upgrade pre-commit
-	pre-commit install
+	.venv/bin/pip install --upgrade pre-commit
+	.venv/bin/pre-commit install || true
+
+dev-recreate:
+	# remove and recreate the venv from scratch
+	rm -rf .venv
+	python3 -m venv .venv
+	.venv/bin/python -m pip install --upgrade pip
+	.venv/bin/pip install -e .
+	.venv/bin/pip install --upgrade pre-commit
+	.venv/bin/pre-commit install || true
 
 py-fmt:
 	# Format Python files with ruff and then run a check
