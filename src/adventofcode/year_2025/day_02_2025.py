@@ -52,7 +52,6 @@ def part_two(input_data: list[str]):
         raise SolutionNotFoundError(2025, 2, 1)
 
     return answer
-    return answer
 
 
 if __name__ == "__main__":
