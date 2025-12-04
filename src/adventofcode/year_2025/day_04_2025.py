@@ -2,6 +2,8 @@ from adventofcode.util.exceptions import SolutionNotFoundError
 from adventofcode.registry.decorators import register_solution
 from adventofcode.util.input_helpers import get_input_for_day
 
+import numpy as np
+
 
 @register_solution(2025, 4, 1)
 def part_one(input_data: list[str]):
@@ -33,7 +35,35 @@ def part_one(input_data: list[str]):
 
 @register_solution(2025, 4, 2)
 def part_two(input_data: list[str]):
-    answer = ...
+    original_data = np.array([list(line) for line in input_data])
+    old_data = original_data.copy()
+
+    while True:
+        new_data = old_data.copy()
+
+        for x_idx, line in enumerate(old_data):
+            for y_idx, element in enumerate(line):
+                if element == "@":
+                    surrounding_papers = 0
+
+                    for dx in [-1, 0, 1]:
+                        for dy in [-1, 0, 1]:
+                            if (
+                                0 <= x_idx + dx < len(old_data)
+                                and 0 <= y_idx + dy < len(line)
+                                and not (dx == 0 and dy == 0)
+                                and old_data[x_idx + dx][y_idx + dy] == "@"
+                            ):
+                                surrounding_papers += 1
+                    if surrounding_papers < 4:
+                        new_data[x_idx][y_idx] = "."
+
+        if np.array_equal(new_data, old_data):
+            break
+
+        old_data = new_data.copy()
+
+    answer = (new_data != original_data).sum()
 
     if not answer:
         raise SolutionNotFoundError(2025, 4, 2)
