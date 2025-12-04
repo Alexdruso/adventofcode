@@ -7,16 +7,16 @@ from adventofcode.util.input_helpers import get_input_for_day
 def part_one(input_data: list[str]):
     results = []
 
-    for input in input_data:
+    for line in input_data:
         idx_max = 0
         max_digit = "0"
 
-        for index, digit in enumerate(input[:-1]):
+        for index, digit in enumerate(line[:-1]):
             if digit > max_digit:
                 max_digit = digit
                 idx_max = index
 
-        result = input[idx_max] + max(list(input)[idx_max + 1 : :])
+        result = line[idx_max] + max(list(line)[idx_max + 1 : :])
         results.append(int(result))
 
     answer = sum(results)
@@ -29,7 +29,25 @@ def part_one(input_data: list[str]):
 
 @register_solution(2025, 3, 2)
 def part_two(input_data: list[str]):
-    answer = ...
+    n_digits_needed = 12
+
+    answer = 0
+
+    for line in input_data:
+        result = ""
+        for digits_left in range(n_digits_needed, 0, -1):
+            idx_max = 0
+            max_digit = "0"
+
+            for index, digit in enumerate(line[:-digits_left]):
+                if digit > max_digit:
+                    max_digit = digit
+                    idx_max = index
+
+            result += line[idx_max]
+            line = line[idx_max + 1 : :]
+
+        answer += int(result)
 
     if not answer:
         raise SolutionNotFoundError(2025, 3, 2)
