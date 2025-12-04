@@ -39,7 +39,7 @@ def part_two(input_data: list[str]):
             idx_max = 0
             max_digit = "0"
 
-            for index, digit in enumerate(line[:-digits_left]):
+            for index, digit in enumerate(line[: len(line) - digits_left + 1]):
                 if digit > max_digit:
                     max_digit = digit
                     idx_max = index
