@@ -5,16 +5,16 @@ from adventofcode.util.input_helpers import get_input_for_day
 
 @register_solution(2025, 5, 1)
 def part_one(input_data: list[str]):
-    ranges = []
+    ranges = set()
 
     for index, line in enumerate(input_data):
         if line.strip() == "":
             break
         start, end = line.split("-")
-        ranges.append((int(start), int(end) + 1))
+        ranges.add(range(int(start), int(end) + 1))
 
     def is_in_ranges(num: int) -> bool:
-        return any(start <= num < end for start, end in ranges)
+        return any(num in range_elem for range_elem in ranges)
 
     answer = sum(
         1
