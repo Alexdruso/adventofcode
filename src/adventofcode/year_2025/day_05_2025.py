@@ -5,16 +5,16 @@ from adventofcode.util.input_helpers import get_input_for_day
 
 @register_solution(2025, 5, 1)
 def part_one(input_data: list[str]):
-    ranges = set()
+    ranges = []
 
     for index, line in enumerate(input_data):
         if line.strip() == "":
             break
         start, end = line.split("-")
-        ranges.add(range(int(start), int(end) + 1))
+        ranges.append((int(start), int(end) + 1))
 
     def is_in_ranges(num: int) -> bool:
-        return any(num in range_elem for range_elem in ranges)
+        return any(start <= num < end for start, end in ranges)
 
     answer = sum(
         1
@@ -30,7 +30,24 @@ def part_one(input_data: list[str]):
 
 @register_solution(2025, 5, 2)
 def part_two(input_data: list[str]):
-    answer = ...
+    ranges = []
+
+    for index, line in enumerate(input_data):
+        if line.strip() == "":
+            break
+        start, end = line.split("-")
+        ranges.append((int(start), int(end) + 1))
+
+    ranges.sort()
+
+    merged = []
+    for start, end in ranges:
+        if merged and start <= merged[-1][1]:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], end))
+        else:
+            merged.append((start, end))
+
+    answer = sum(end - start for start, end in merged)
 
     if not answer:
         raise SolutionNotFoundError(2025, 5, 2)
