@@ -30,18 +30,16 @@ def part_one(input_data: list[str]):
 
 @register_solution(2025, 5, 2)
 def part_two(input_data: list[str]):
-    ranges = []
+    ranges = set()
 
-    for index, line in enumerate(input_data):
+    for line in input_data:
         if line.strip() == "":
             break
         start, end = line.split("-")
-        ranges.append((int(start), int(end) + 1))
-
-    ranges.sort()
+        ranges.add((int(start), int(end) + 1))
 
     merged = []
-    for start, end in ranges:
+    for start, end in sorted(ranges):
         if merged and start <= merged[-1][1]:
             merged[-1] = (merged[-1][0], max(merged[-1][1], end))
         else:
