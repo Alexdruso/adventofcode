@@ -13,7 +13,7 @@ def part_one(input_data: list[str]):
         start, end = line.split("-")
         ranges.append((int(start), int(end) + 1))
 
-    def is_in_ranges(num):
+    def is_in_ranges(num: int) -> bool:
         return any(start <= num < end for start, end in ranges)
 
     answer = sum(
