@@ -3,8 +3,6 @@ from adventofcode.registry.decorators import register_solution
 from adventofcode.util.input_helpers import get_input_for_day
 import numpy as np
 
-from functools import lru_cache
-
 
 def parse_machine(line: str):
     # Example line:
@@ -150,238 +148,144 @@ def part_one(input_data: list[str]):
     return total
 
 
-def parse_joltage_machine(line: str):
+def parse_machine_joltage(line: str):
+    """
+    Parse one line into (targets, buttons, n)
+    - targets: list[int] target integer counters (from {...})
+    - buttons: list[list[int]] each button's affected counter indices
+    - n: number of counters
+    """
     parts = line.strip().split()
-    buttons = []
-    target = None
+    if not parts:
+        return [], [], 0
+
+    # diagram may be first (ignore for part 2), then parentheses and curly braces
+    # find the curly-brace token for targets
+    curly_token = None
     for p in parts:
-        if p.startswith("("):
+        if p.startswith("{") and p.endswith("}"):
+            curly_token = p
+            break
+    if curly_token is None:
+        # try concatenated tokens (space separated values unlikely but handle)
+        raise ValueError(f"Missing joltage target specification in line: {line}")
+
+    inside = curly_token[1:-1].strip()
+    if inside == "":
+        targets = []
+    else:
+        targets = [int(x) for x in inside.split(",")]
+    n = len(targets)
+
+    # collect button specs: tokens that start with '(' and end with ')'
+    buttons = []
+    for p in parts:
+        if p.startswith("(") and p.endswith(")"):
             inner = p[1:-1].strip()
             if inner == "":
                 buttons.append([])
             else:
                 buttons.append([int(x) for x in inner.split(",")])
-        elif p.startswith("{"):
-            inner = p[1:-1].strip()
-            target = np.array([int(x) for x in inner.split(",")], dtype=np.int16)
-    return target, buttons
-
-
-def solve_machine_branch_and_bound(target: list[int], buttons: list[list[int]]):
-    """
-    Solve A x = target, x >= 0 integer, minimizing sum(x).
-    target: list of k nonnegative ints
-    buttons: list of m lists of indices indicating which counters each button increments
-    Returns minimal total presses (int) or None if impossible.
-    """
-
-    k = len(target)
-    m = len(buttons)
-
-    # Quick infeasibility check: every counter with positive target must be covered by >=1 button
-    for i, ti in enumerate(target):
-        if ti > 0:
-            covered = False
-            for b in buttons:
-                if i in b:
-                    covered = True
-                    break
-            if not covered:
-                return None  # impossible
-
-    # Precompute button columns as tuple vectors for fast arithmetic
-    cols = [tuple(1 if i in b else 0 for i in range(k)) for b in buttons]
-
-    # Upper bound: greedy constructive solution (fast, gives initial best)
-    def greedy_upper_bound():
-        rem = list(target)
-        presses = 0
-        # while any remaining >0, pick button with highest "useful coverage" per press
-        while True:
-            if all(r == 0 for r in rem):
-                return presses
-            best_idx = None
-            best_gain = 0
-            # compute how many remaining units each single press of button would decrease (sum of min(1,rem_i) over its columns)
-            for j in range(m):
-                gain = 0
-                for i in range(k):
-                    if cols[j][i] and rem[i] > 0:
-                        gain += 1
-                if gain > best_gain:
-                    best_gain = gain
-                    best_idx = j
-            if best_gain == 0:
-                return None  # stuck -> infeasible
-            # compute how many times we should press that button greedily:
-            # limited by the smallest remaining count among the counters it affects
-            ub = min((rem[i] for i in range(k) if cols[best_idx][i]), default=0)
-            if ub <= 0:
-                # fallback press once
-                ub = 1
-            # pressing ub times
-            presses += ub
-            for i in range(k):
-                if cols[best_idx][i]:
-                    rem[i] = max(0, rem[i] - ub)
-            # loop continues
-        # unreachable
-
-    initial_ub = greedy_upper_bound()
-    if initial_ub is None:
-        return None
-    best_global = initial_ub
-
-    # Precompute for subset LB: for each subset S of counters, compute max coverage per press
-    # We'll iterate 1..(1<<k)-1 subsets. For empty subset skip.
-    subset_maxcov = {}
-    subset_sumreq = {}
-    for s in range(1, 1 << k):
-        # S indices
-        S_indices = [i for i in range(k) if (s >> i) & 1]
-        sumreq = sum(target[i] for i in S_indices)
-        maxcov = 0
-        for j in range(m):
-            cov = sum(1 for i in S_indices if cols[j][i])
-            if cov > maxcov:
-                maxcov = cov
-        subset_maxcov[s] = maxcov
-        subset_sumreq[s] = sumreq
-
-    # lower bound function using all subsets: LB = max_S ceil(sumreq_S / maxcov_S)
-    def lower_bound_on_total(rem):
-        # rem is tuple/list of remaining requirements
-        sumrem = sum(rem)
-        if sumrem == 0:
-            return 0
-        lb = 0
-        # full-sum simple bound: at least ceil(sumrem / max_cov_over_all_buttons)
-        overall_maxcov = max(sum(cols[j][i] for i in range(k)) for j in range(m))
-        if overall_maxcov == 0:
-            return 10**18  # impossible
-        lb = (sumrem + overall_maxcov - 1) // overall_maxcov
-        # try subsets (k small)
-        for s in range(1, 1 << k):
-            maxcov = subset_maxcov[s]
-            if maxcov == 0:
-                # if any counter in subset has >0 and no button covers it, infeasible
-                # but pre-check should have caught it
-                continue
-            ssum = 0
-            bit = s
-            idx = 0
-            while bit:
-                if bit & 1:
-                    ssum += rem[idx]
-                idx += 1
-                bit >>= 1
-            if ssum == 0:
-                continue
-            candidate = (ssum + maxcov - 1) // maxcov
-            if candidate > lb:
-                lb = candidate
-        return lb
-
-    # Memoization: map remaining target tuple -> best found cost from this state (or INF if impossible)
-    INF = 10**18
-
-    @lru_cache(maxsize=None)
-    def dfs(rem_tuple):
-        nonlocal best_global
-        rem = list(rem_tuple)
-        # finished?
-        if all(x == 0 for x in rem):
-            return 0
-        # lower bound pruning:
-        lb = lower_bound_on_total(rem)
-        if lb >= best_global:
-            return INF
-        # Additional quick bound: sum of rem is at least lb (already)
-        # Choose branching variable (button) heuristically:
-        # choose button that covers the largest sum of remaining requirements (most impact)
-        best_button = None
-        best_impact = -1
-        for j in range(m):
-            impact = 0
-            for i in range(k):
-                if cols[j][i]:
-                    impact += rem[i]
-            if impact > best_impact:
-                best_impact = impact
-                best_button = j
-        if best_impact <= 0:
-            return INF  # stuck
-        j = best_button
-        # upper bound for this button: cannot press more than min_i rem[i] for i in its coverage
-        ub = min((rem[i] for i in range(k) if cols[j][i]), default=0)
-        # If button affects no counters, skip it
-        if ub <= 0:
-            # but other buttons might; find next best button
-            # as fallback, iterate all buttons with ub>0
-            candidates = [
-                idx
-                for idx in range(m)
-                if any(cols[idx][i] and rem[i] > 0 for i in range(k))
-            ]
-        else:
-            candidates = [j]
-
-        best_here = INF
-
-        # try candidate buttons; for each, try pressing from ub down to 0 (try larger presses first to find good solution quickly)
-        for btn in candidates:
-            ub_btn = min((rem[i] for i in range(k) if cols[btn][i]), default=0)
-            # iterate number of presses t from ub_btn down to 0
-            # small optimization: cap attempted t by best_global - 1 (if t >= best_global prune)
-            max_try = min(ub_btn, best_global - 1)
-            for t in range(max_try, -1, -1):
-                if t == 0:
-                    new_rem = tuple(rem)
-                else:
-                    new_rem_list = rem.copy()
-                    for i in range(k):
-                        if cols[btn][i]:
-                            # subtract t but don't go negative
-                            new_rem_list[i] = new_rem_list[i] - t
-                            if new_rem_list[i] < 0:
-                                new_rem_list[i] = 0
-                    new_rem = tuple(new_rem_list)
-                # Quick lower bound: cost_so_far + lb(new_rem) must be < best_global
-                lb2 = lower_bound_on_total(new_rem)
-                if t + lb2 >= best_global:
-                    continue
-                sub = dfs(new_rem)
-                if sub != INF:
-                    cand_total = t + sub
-                    if cand_total < best_here:
-                        best_here = cand_total
-                        if cand_total < best_global:
-                            best_global = cand_total
-                # If best_here is 0 then can't get better
-                if best_here == 0:
-                    break
-            if best_here == 0:
-                break
-
-        return best_here
-
-    res = dfs(tuple(target))
-    if res >= INF:
-        return None
-    return res
+    return targets, buttons, n
 
 
 @register_solution(2025, 10, 2)
 def part_two(input_data: list[str]):
-    total = 0
+    total_presses = 0
+
+    # delayed import of cvxpy so we can raise a helpful error
+    try:
+        import cvxpy as cp
+    except Exception as e:
+        raise RuntimeError(
+            "cvxpy is required for part_two but could not be imported. "
+            "Install it with `pip install cvxpy` and a compatible solver (GLPK or ECOS)."
+        ) from e
+
     for line in input_data:
-        target, buttons = parse_joltage_machine(line)  # returns Python lists
-        presses = solve_machine_branch_and_bound(target, buttons)
-        print(presses)  # optional, for debugging
-        if presses is None:
+        if not line.strip():
+            continue
+        targets, buttons, n = parse_machine_joltage(line)
+        m = len(buttons)
+
+        # Trivial case: no counters
+        if n == 0:
+            continue
+
+        # Build integer matrix A of shape (n, m)
+        A = np.zeros((n, m), dtype=int)
+        for j, b in enumerate(buttons):
+            for idx in b:
+                if idx < 0 or idx >= n:
+                    raise ValueError(
+                        f"Button index {idx} out of range for line: {line}"
+                    )
+                A[idx, j] += (
+                    1  # counts are additive; but entries are 0/1 in given input
+                )
+
+        b = np.array(targets, dtype=int)
+
+        # If there are no buttons but targets nonzero -> infeasible
+        if m == 0:
+            if np.any(b != 0):
+                raise SolutionNotFoundError(2025, 10, 2)
+            else:
+                continue
+
+        # cvxpy integer variable (nonnegative)
+        x = cp.Variable(m, integer=True, nonneg=True)
+
+        constraints = [A @ x == b]
+
+        objective = cp.Minimize(cp.sum(x))
+
+        prob = cp.Problem(objective, constraints)
+
+        # Try GLPK_MI first, else ECOS_BB as fallback
+        solved = False
+        for solver in ("GLPK_MI", "ECOS_BB"):
+            try:
+                prob.solve(solver=solver, verbose=False)
+                solved = True
+                break
+            except Exception:
+                # try next solver
+                solved = False
+
+        if not solved:
+            # Try default solve (may still work)
+            try:
+                prob.solve()
+                solved = True
+            except Exception as e:
+                raise RuntimeError(
+                    "CVXPY failed to solve the integer program. Ensure a mixed-integer solver is available "
+                    "(GLPK_MI or ECOS_BB are recommended)."
+                ) from e
+
+        # Check feasibility and extract integer solution
+        if x.value is None:
             raise SolutionNotFoundError(2025, 10, 2)
-        total += presses
-    return total
+
+        # numerical rounding to nearest integer (should be integral)
+        x_sol = np.rint(x.value).astype(int)
+
+        # verify solution exactly satisfies constraints (A @ x_sol == b)
+        if not np.array_equal(A.dot(x_sol), b):
+            # It's possible solver returned fractional/inexact result; try to round and re-check
+            raise SolutionNotFoundError(2025, 10, 2)
+
+        # ensure non-negative
+        if np.any(x_sol < 0):
+            raise SolutionNotFoundError(2025, 10, 2)
+
+        total_presses += int(np.sum(x_sol))
+
+    if total_presses is None:
+        raise SolutionNotFoundError(2025, 10, 2)
+
+    return total_presses
 
 
 if __name__ == "__main__":
