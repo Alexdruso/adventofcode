@@ -68,11 +68,17 @@ def parse_input(input_data: list[str]) -> ParsedInput:
 def part_one(input_data: list[str]):
     parsed_input = parse_input(input_data)
 
-    print(parsed_input.shapes_to_area)
+    print(parsed_input.regions)
 
-    answer = ...
-
-    print(input_data)
+    answer = sum(
+        1
+        for region in parsed_input.regions
+        if sum(
+            count * parsed_input.shapes_to_area.get(str(idx), 0)
+            for idx, count in enumerate(region.shape_number)
+        )
+        <= region.area
+    )
 
     if not answer:
         raise SolutionNotFoundError(2025, 12, 1)
